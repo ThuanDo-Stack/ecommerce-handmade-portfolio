@@ -8,7 +8,7 @@ interface RegisterProps {
 }
 
 const Register: React.FC<RegisterProps> = ({ onSwitchToLogin, onClose }) => {
-    // Lấy toàn bộ biến và hàm từ Hook ra
+    // Lấy toàn bộ biến và hàm từ Hook ra, truyền onSwitchToLogin vào
     const {
         email, setEmail,
         password, setPassword,
@@ -19,7 +19,7 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin, onClose }) => {
         captchaCode, userCaptchaInput, setUserCaptchaInput, captchaColor,
         generateCaptcha,
         handleRegister
-    } = useRegister();
+    } = useRegister(onSwitchToLogin);
 
     return (
         <div className="auth-container">

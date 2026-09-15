@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { registerUser } from '../services/AuthService';
 
-export const useRegister = () => {
+export const useRegister = (onSuccess?: () => void) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [username, setUsername] = useState('');
@@ -10,8 +10,8 @@ export const useRegister = () => {
     const [captchaCode, setCaptchaCode] = useState('');
     const [userCaptchaInput, setUserCaptchaInput] = useState('');
     const [captchaColor, setCaptchaColor] = useState('#000');
-            const [fullName, setFullName] = useState('');
-        const [phone, setPhone] = useState('');
+    const [fullName, setFullName] = useState('');
+    const [phone, setPhone] = useState('');
 
     const generateCaptcha = () => {
         const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
@@ -28,6 +28,7 @@ export const useRegister = () => {
     const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
+    setMessage('');
 
     // Kiểm tra CAPTCHA
     if (userCaptchaInput !== captchaCode) {
@@ -52,15 +53,22 @@ export const useRegister = () => {
             phone 
         });
 
-        setMessage('Đăng ký thành công!');
+        setMessage('Đăng ký thành công! Đang chuyển hướng đến Đăng nhập...');
         
-        // Reset toàn bộ form sau khi thành công
-        setEmail(''); 
-        setPassword(''); 
-        setUsername('');
-        setFullName(''); // Thêm dòng này
-        setPhone('');    // Thêm dòng này
-        generateCaptcha();
+        // Chuyển hướng sang đăng nhập sau 1.5 giây
+        if (onSuccess) {
+            setTimeout(() => {
+                onSuccess();
+            }, 1500);
+        } else {
+            // Nếu không có callback (hiếm xảy ra), tự clear form
+            setEmail(''); 
+            setPassword(''); 
+            setUsername('');
+            setFullName(''); 
+            setPhone('');    
+            generateCaptcha();
+        }
     } catch (err) {
         setError((err as Error).message || 'Lỗi đăng ký.');
         generateCaptcha();
