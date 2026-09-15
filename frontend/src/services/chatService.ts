@@ -53,7 +53,8 @@ export const ChatService = {
                 headers['Authorization'] = `Bearer ${token}`;
             }
 
-            const response = await fetch('http://localhost:8080/api/chat/ask/stream', {
+            const apiUrl = process.env.REACT_APP_API_URL || '/api';
+            const response = await fetch(`${apiUrl}/chat/ask/stream`, {
                 method: 'POST',
                 headers,
                 body: JSON.stringify(request)

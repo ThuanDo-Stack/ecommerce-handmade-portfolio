@@ -36,7 +36,12 @@ const AdminLayout: React.FC = () => {
         
    //-
         const client = new Client({
-            webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
+            webSocketFactory: () => {
+                const wsUrl = process.env.REACT_APP_API_URL 
+                    ? process.env.REACT_APP_API_URL.replace('/api', '') 
+                    : '';
+                return new SockJS(`${wsUrl}/ws`);
+            },
             debug: (str) => console.log(str),
             reconnectDelay: 5000,
             onConnect: () => {
@@ -119,7 +124,7 @@ const AdminLayout: React.FC = () => {
                     </div>
                     {exportToast.fileName && (
                         <a 
-                            href={`http://localhost:8080/api/admin/analytics/download-report/${exportToast.fileName}`} 
+                            href={`${process.env.REACT_APP_API_URL || '/api'}/admin/analytics/download-report/${exportToast.fileName}`} 
                             target="_blank" rel="noreferrer"
                             style={{
                                 color: '#fff', textDecoration: 'underline', alignSelf: 'flex-start', marginLeft: '32px', fontSize: '0.9rem'

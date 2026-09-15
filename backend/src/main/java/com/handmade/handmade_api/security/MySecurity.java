@@ -81,37 +81,41 @@ public class MySecurity {
                         .requestMatchers("/api/auth/**").permitAll()
 
                         // ===== PUBLIC GET ENDPOINTS =====
-                        .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/product-images/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/categories", "/api/categories/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/product-images", "/api/product-images/**").permitAll()
                         // Reviews: public cho product reviews, private cho user-specific
-                        .requestMatchers(HttpMethod.GET, "/api/reviews/products/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/reviews/products", "/api/reviews/products/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/reviews/can-review").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/reviews/users/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/voucher/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/reviews/users", "/api/reviews/users/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/voucher", "/api/voucher/**").permitAll()
 
-                        // Payment public
-                        .requestMatchers("/api/payment/**").permitAll()
+                        // Payment public (Chỉ cho phép callback từ VNPay và lấy danh sách cổng thanh toán)
+                        .requestMatchers(HttpMethod.GET, "/api/payment/methods").permitAll()
+                        .requestMatchers("/api/payment/vnpay-callback").permitAll()
+                        .requestMatchers("/api/payment/vnpay/return").permitAll()
+                        .requestMatchers("/api/payment/vnpay/ipn").permitAll()
+                        // Các chức năng Payment khác (như tạo link thanh toán /process) sẽ rơi xuống phần authenticated phía dưới
 
-                        // Carts public
-                        .requestMatchers("/api/carts/**").permitAll()
+                        // Carts - Yêu cầu đăng nhập mới được thao tác giỏ hàng trên server
+                        // Bỏ permitAll() cho /api/carts, để nó rơi xuống phần authenticated
 
                         // ===== CHATBOX PUBLIC =====
-                        .requestMatchers("/api/chat/**").permitAll()
+                        .requestMatchers("/api/chat", "/api/chat/**").permitAll()
                         .requestMatchers("/api/chat/ask").permitAll()
-                        .requestMatchers("/api/chat/history/**").permitAll()
-                        .requestMatchers("/api/chat/session/**").permitAll()
+                        .requestMatchers("/api/chat/history", "/api/chat/history/**").permitAll()
+                        .requestMatchers("/api/chat/session", "/api/chat/session/**").permitAll()
 
                         // ===== LUCKY WHEEL PUBLIC =====
                         .requestMatchers(HttpMethod.GET, "/api/prizes").permitAll()
                         .requestMatchers("/api/lucky-wheel/spin").permitAll()
-                        .requestMatchers("/api/lucky-wheel/**").permitAll()
+                        .requestMatchers("/api/lucky-wheel", "/api/lucky-wheel/**").permitAll()
 
                         // ===== TEST ENDPOINTS (Chỉ dùng cho development) =====
-                        .requestMatchers("/api/test/**").permitAll()
-                        .requestMatchers("/api/public/**").permitAll()
-                        .requestMatchers("/ws/**").permitAll()
-                        .requestMatchers("/api/admin/analytics/download-report/**").permitAll()
+                        .requestMatchers("/api/test", "/api/test/**").permitAll()
+                        .requestMatchers("/api/public", "/api/public/**").permitAll()
+                        .requestMatchers("/ws", "/ws/**").permitAll()
+                        .requestMatchers("/api/admin/analytics/download-report", "/api/admin/analytics/download-report/**").permitAll()
 
                         // ==================== CẤP ĐỘ 2: AUTHENTICATED - Cần đăng nhập ====================
                         // Lucky wheel authenticated endpoints
