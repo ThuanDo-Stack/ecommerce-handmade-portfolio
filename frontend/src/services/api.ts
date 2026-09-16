@@ -125,6 +125,11 @@ api.interceptors.response.use(
             localStorage.removeItem('userEmail');
         }
 
+        // Bắt lỗi 403 - Cấm truy cập (Thường do tài khoản Demo)
+        if (error?.response?.status === 403) {
+            alert('LƯU Ý: Bạn đang ở chế độ Demo. Tính năng này đã bị khóa để bảo vệ dữ liệu hệ thống!');
+        }
+
         return Promise.reject(error);
     }
 );

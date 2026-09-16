@@ -30,6 +30,7 @@ public class InitDataConfig implements ApplicationRunner {
     public void run(ApplicationArguments args) {
         seedRole("ROLE_ADMIN", "Quản trị viên", "#7c3aed");
         seedRole("ROLE_USER",  "Khách hàng",     "#1d4ed8");
+        seedRole("ROLE_DEMO_ADMIN", "Khách xem Admin", "#10b981");
     }
 
     private void seedRole(String name, String displayName, String color) {

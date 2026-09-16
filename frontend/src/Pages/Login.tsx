@@ -23,7 +23,8 @@ const Login: React.FC<LoginProps> = ({
         password,
         setPassword,
         error,
-        handleSubmit
+        handleSubmit,
+        handleDemoLogin
     } = useLogin(onLoginSuccess);
 
     return (
@@ -57,6 +58,9 @@ const Login: React.FC<LoginProps> = ({
                 />
 
                 <button type="submit" className="auth-button">Đăng Nhập</button>
+                <button type="button" className="auth-button demo-button" onClick={handleDemoLogin} style={{ backgroundColor: '#10b981', marginTop: '10px' }}>
+                    Đăng Nhập Nhanh (Demo)
+                </button>
             </form>
 
             {/* Các link chuyển hướng giữ nguyên cấu trúc thẻ <a> */}

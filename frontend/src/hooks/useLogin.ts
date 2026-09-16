@@ -49,10 +49,29 @@ export const useLogin = (onLoginSuccess: (user: User) => void) => {
         }
     };
 
+    const handleDemoLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
+        setError('');
+        try {
+            const user: User = await loginUser('demo@admin.com', 'demo123');
+            localStorage.setItem('user', JSON.stringify(user));
+            if (user.id) {
+                await mergeCart(user.id);
+                await refreshCart();
+            }
+            onLoginSuccess(user);
+            navigate('/admin');
+        } catch (err: any) {
+            console.error("Demo Login Error:", err);
+            setError('Không thể đăng nhập bằng tài khoản Demo.');
+        }
+    };
+
     return {
         email, setEmail,
         password, setPassword,
         error,
-        handleSubmit
+        handleSubmit,
+        handleDemoLogin
     };
 };

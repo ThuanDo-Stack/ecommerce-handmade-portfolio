@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import java.util.Collections;
 
 @Component
-@Profile("dev") // Chỉ chạy khi bạn cấu hình spring.profiles.active=dev
+// Đã bỏ @Profile("dev") để cho phép Docker (Production) cũng tự sinh được tài khoản Demo và Admin
 public class DataSeeder implements CommandLineRunner {
 
     @Autowired
@@ -56,6 +56,29 @@ public class DataSeeder implements CommandLineRunner {
 
             userRepository.save(admin);
             System.out.println(">>> Đã tạo tài khoản Admin mặc định thành công!");
+        }
+
+        // 3. Tạo tài khoản Demo Admin
+        if (roleRepository.findByName("ROLE_DEMO_ADMIN").isEmpty()) {
+            Role demoAdminRole = new Role();
+            demoAdminRole.setName("ROLE_DEMO_ADMIN");
+            demoAdminRole.setDisplayName("Demo Administrator");
+            roleRepository.save(demoAdminRole);
+        }
+
+        if (userRepository.findByEmail("demo@admin.com").isEmpty()) {
+            User demoAdmin = new User();
+            demoAdmin.setUsername("demoadmin");
+            demoAdmin.setEmail("demo@admin.com");
+            demoAdmin.setFullName("Khách xem Demo Admin");
+            demoAdmin.setPassword(passwordEncoder.encode("demo123")); 
+            demoAdmin.setEnabled(true);
+
+            Role demoRole = roleRepository.findByName("ROLE_DEMO_ADMIN").get();
+            demoAdmin.setRoles(Collections.singleton(demoRole));
+
+            userRepository.save(demoAdmin);
+            System.out.println(">>> Đã tạo tài khoản Demo Admin thành công (demo@admin.com / demo123)!");
         }
     }
 }

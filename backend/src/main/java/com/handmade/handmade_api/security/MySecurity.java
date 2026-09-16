@@ -128,23 +128,14 @@ public class MySecurity {
                         // Users và Orders - Cần USER hoặc ADMIN
                         .requestMatchers("/api/users/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/api/orders/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/admin/orders/**").hasAnyRole("ADMIN", "DEMO_ADMIN")
                         .requestMatchers("/api/admin/orders/**").hasRole("ADMIN")
 
                         // ==================== CẤP ĐỘ 3: ADMIN - Chỉ ADMIN mới được truy cập ====================
-                        // Rule tổng quát admin — đặt tại đây, SAU các public rules
+                        // Cho phép DEMO_ADMIN gọi các API GET (đọc dữ liệu)
+                        .requestMatchers(HttpMethod.GET, "/api/admin/**").hasAnyRole("ADMIN", "DEMO_ADMIN")
+                        // Chặn các thao tác còn lại (POST, PUT, DELETE, PATCH) chỉ cho ADMIN
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-
-                        // Admin Chat Configuration
-                        .requestMatchers("/api/admin/chat-config/**").hasRole("ADMIN")
-                        .requestMatchers("/api/admin/chat-faq/**").hasRole("ADMIN")
-
-                        // Admin Lucky Wheel
-                        .requestMatchers("/api/admin/lucky-wheel/**").hasRole("ADMIN")
-                        .requestMatchers("/api/admin/lucky-wheel/prizes").hasRole("ADMIN")
-                        .requestMatchers("/api/admin/lucky-wheel/prizes/**").hasRole("ADMIN")
-                        .requestMatchers("/api/admin/lucky-wheel/spin-profiles").hasRole("ADMIN")
-                        .requestMatchers("/api/admin/lucky-wheel/users/**").hasRole("ADMIN")
-                        .requestMatchers("/api/admin/lucky-wheel/statistics").hasRole("ADMIN")
 
                         // General Admin endpoints
 
