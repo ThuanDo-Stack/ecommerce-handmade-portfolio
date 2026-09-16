@@ -1,8 +1,13 @@
 import React from 'react';
 import { useAdminProducts } from '../hooks/useAdminProducts';
+import { useAdminPermissions } from '../../hooks/useAdminPermissions';
+import { useNotify } from '../../components/NotificationContext';
 import '../styles/products.css';
 
 const AdminProducts: React.FC = () => {
+    const { canEdit } = useAdminPermissions();
+    const notify = useNotify();
+
     const {
         products,
         loading,
@@ -47,19 +52,30 @@ const AdminProducts: React.FC = () => {
                     </div>
 
                     <div className="import-section">
-                        <label 
-                            className={`import-btn ${importing ? 'disabled' : ''}`}
-                        >
-                            <span>{importing ? '⏳' : '📥'}</span>
-                            <span>{importing ? 'Đang nạp...' : 'Nhập Excel'}</span>
-                            <input 
-                                type="file" 
-                                accept=".xlsx" 
-                                onChange={onFileChange} 
-                                disabled={importing}
-                                style={{ display: 'none' }} 
-                            />
-                        </label>
+                        {canEdit ? (
+                            <label className={`import-btn ${importing ? 'disabled' : ''}`}>
+                                <span>{importing ? '⏳' : '📥'}</span>
+                                <span>{importing ? 'Đang nạp...' : 'Nhập Excel'}</span>
+                                <input 
+                                    type="file" 
+                                    accept=".xlsx" 
+                                    onChange={onFileChange} 
+                                    disabled={importing}
+                                    style={{ display: 'none' }} 
+                                />
+                            </label>
+                        ) : (
+                            <label 
+                                className="import-btn disabled" 
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    notify.warning("Chức năng Import bị vô hiệu hoá trong chế độ Demo.");
+                                }}
+                            >
+                                <span>📥</span>
+                                <span>Nhập Excel</span>
+                            </label>
+                        )}
                     </div>
                 </div>
 
@@ -187,8 +203,8 @@ const AdminProducts: React.FC = () => {
                                                                         {displayStock === 0 ? 'Hết hàng' : `${displayStock} chiếc`}
                                                                     </span>
                                                                     <button 
-                                                                        onClick={() => handleStartEdit(p.id, displayStock)}
-                                                                        className="btn-icon btn-edit"
+                                                                        onClick={() => canEdit ? handleStartEdit(p.id, displayStock) : notify.warning("Chức năng bị khoá trong Demo")}
+                                                                        className={`btn-icon btn-edit ${!canEdit ? 'disabled' : ''}`}
                                                                     >
                                                                         Sửa
                                                                     </button>
@@ -203,14 +219,14 @@ const AdminProducts: React.FC = () => {
                                                         <td>
                                                             <div className="action-buttons">
                                                                 <button 
-                                                                    onClick={() => handleStatusChange(p.id, p.status)}
-                                                                    className="btn-toggle"
+                                                                    onClick={() => canEdit ? handleStatusChange(p.id, p.status) : notify.warning("Chức năng bị khoá trong Demo")}
+                                                                    className={`btn-toggle ${!canEdit ? 'disabled' : ''}`}
                                                                 >
                                                                     {p.status === 'active' ? 'Ẩn' : 'Hiện'}
                                                                 </button>
                                                                 <button 
-                                                                    onClick={() => handleDelete(p.id)}
-                                                                    className="btn-delete"
+                                                                    onClick={() => canEdit ? handleDelete(p.id) : notify.warning("Chức năng bị khoá trong Demo")}
+                                                                    className={`btn-delete ${!canEdit ? 'disabled' : ''}`}
                                                                 >
                                                                     Xóa
                                                                 </button>

@@ -11,9 +11,12 @@ export const useLogin = (onLoginSuccess: (user: User) => void) => {
     const { mergeCart, refreshCart } = useCart();
     const navigate = useNavigate();
 
+    const [isLoading, setIsLoading] = useState(false);
+
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setError('');
+        setIsLoading(true);
 
         try {
             // 1. Gọi API Login
@@ -35,9 +38,15 @@ export const useLogin = (onLoginSuccess: (user: User) => void) => {
 
             // 5. Callback báo thành công (để cập nhật UI chung của App)
             onLoginSuccess(user);
+            setIsLoading(false);
 
             // 6. Điều hướng cuối cùng sau khi mọi thứ đã sẵn sàng
-            if (roles.includes('ROLE_ADMIN') || roles.includes('ADMIN')) {
+            if (
+                roles.includes('ROLE_ADMIN') || 
+                roles.includes('ADMIN') ||
+                roles.includes('ROLE_DEMO_ADMIN') ||
+                roles.includes('DEMO_ADMIN')
+            ) {
                 navigate('/admin');
             } else {
                 navigate('/');
@@ -46,12 +55,14 @@ export const useLogin = (onLoginSuccess: (user: User) => void) => {
         } catch (err: any) {
             console.error("Login Error:", err);
             setError(err.response?.data?.message || err.message || 'Đăng nhập thất bại.');
+            setIsLoading(false);
         }
     };
 
     const handleDemoLogin = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         setError('');
+        setIsLoading(true);
         try {
             const user: User = await loginUser('demo@admin.com', 'demo123');
             localStorage.setItem('user', JSON.stringify(user));
@@ -60,17 +71,19 @@ export const useLogin = (onLoginSuccess: (user: User) => void) => {
                 await refreshCart();
             }
             onLoginSuccess(user);
+            setIsLoading(false);
             navigate('/admin');
         } catch (err: any) {
             console.error("Demo Login Error:", err);
             setError('Không thể đăng nhập bằng tài khoản Demo.');
+            setIsLoading(false);
         }
     };
 
     return {
         email, setEmail,
         password, setPassword,
-        error,
+        error, isLoading,
         handleSubmit,
         handleDemoLogin
     };

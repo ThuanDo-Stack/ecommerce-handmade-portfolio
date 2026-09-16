@@ -86,7 +86,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
     const isAdmin =
         roles.includes('ROLE_ADMIN') ||
-        roles.includes('ADMIN');
+        roles.includes('ADMIN') ||
+        roles.includes('ROLE_DEMO_ADMIN') ||
+        roles.includes('DEMO_ADMIN');
 
     // Không phải admin
     if (!isAdmin) {
@@ -280,7 +282,9 @@ function App() {
                                     const roles = currentUser.roles || [];
                                     const isAdmin =
                                         roles.includes('ROLE_ADMIN') ||
-                                        roles.includes('ADMIN');
+                                        roles.includes('ADMIN') ||
+                                        roles.includes('ROLE_DEMO_ADMIN') ||
+                                        roles.includes('DEMO_ADMIN');
                                     return <Navigate to={isAdmin ? '/admin' : '/'} replace />;
                                 })()
                             ) : (

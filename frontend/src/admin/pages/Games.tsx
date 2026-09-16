@@ -14,11 +14,13 @@ import {
     ExclamationTriangleIcon,
     ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
+import { useAdminPermissions } from '../../hooks/useAdminPermissions';
 import { useNotify } from '../../components/NotificationContext';
 import gameService, { Prize, UserSpinProfile, GameStatistics } from '../../services/gameService';
 import '../styles/games.css';
 
 const Games: React.FC = () => {
+    const { canEdit } = useAdminPermissions();
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'prizes' | 'users' | 'stats'>('prizes');
     const [showPrizeModal, setShowPrizeModal] = useState(false);
@@ -26,7 +28,6 @@ const Games: React.FC = () => {
     const [editingPrize, setEditingPrize] = useState<Prize | null>(null);
     const [selectedUser, setSelectedUser] = useState<UserSpinProfile | null>(null);
     const [pointsToAdd, setPointsToAdd] = useState(0);
-    const [isAdmin, setIsAdmin] = useState(false);
     const [currentUser, setCurrentUser] = useState<any>(null);
     
     // State data
@@ -54,30 +55,14 @@ const Games: React.FC = () => {
     
     const notify = useNotify();
 
-    // Check admin access
+    // Lấy thông tin user hiện tại để hiển thị
     useEffect(() => {
-        const checkAdminAccess = async () => {
-            const user = gameService.getCurrentUser();
-            const admin = gameService.isAdmin();
-            
-            setCurrentUser(user);
-            setIsAdmin(admin);
-            
-            if (!admin) {
-                notify.error('Bạn không có quyền truy cập trang này');
-                setTimeout(() => {
-                    window.location.href = '/';
-                }, 2000);
-            }
-        };
-        
-        checkAdminAccess();
-    }, [notify]);
+        const user = gameService.getCurrentUser();
+        setCurrentUser(user);
+    }, []);
 
     // Fetch data
     const fetchData = useCallback(async () => {
-        if (!isAdmin) return;
-        
         setLoading(true);
         try {
             // Fetch prizes
@@ -103,13 +88,11 @@ const Games: React.FC = () => {
         } finally {
             setLoading(false);
         }
-    }, [isAdmin, notify]);
+    }, [notify]);
 
     useEffect(() => {
-        if (isAdmin) {
-            fetchData();
-        }
-    }, [isAdmin, fetchData]);
+        fetchData();
+    }, [fetchData]);
 
     // Prize handlers
     const handleAddPrize = () => {
@@ -238,21 +221,7 @@ const Games: React.FC = () => {
         return new Date(dateString).toLocaleString('vi-VN');
     };
 
-    // Check if user has admin access
-    if (!isAdmin && !loading) {
-        return (
-            <div className="access-denied">
-                <div className="access-denied-content">
-                    <ShieldCheckIcon className="access-denied-icon" />
-                    <h2>Access Denied</h2>
-                    <p>Bạn không có quyền truy cập trang quản trị</p>
-                    <button onClick={() => window.location.href = '/'}>
-                        Quay lại trang chủ
-                    </button>
-                </div>
-            </div>
-        );
-    }
+    // Component UI
 
     if (loading) {
         return (
@@ -360,7 +329,10 @@ const Games: React.FC = () => {
                 <div className="prizes-tab">
                     <div className="tab-header">
                         <h2>Danh sách giải thưởng</h2>
-                        <button className="btn-create" onClick={handleAddPrize}>
+                        <button 
+                            className={`btn-create ${!canEdit ? 'disabled' : ''}`} 
+                            onClick={() => canEdit ? handleAddPrize() : notify.warning("Chức năng bị khoá trong chế độ Demo.")}
+                        >
                             <PlusIcon className="w-4 h-4" />
                             Thêm giải thưởng
                         </button>
@@ -378,10 +350,16 @@ const Games: React.FC = () => {
                                         <span className="prize-type">{getTypeText(prize.type || 'points')}</span>
                                     </div>
                                     <div className="prize-actions">
-                                        <button className="action-btn edit" onClick={() => handleEditPrize(prize)}>
+                                        <button 
+                                            className={`action-btn edit ${!canEdit ? 'disabled' : ''}`} 
+                                            onClick={() => canEdit ? handleEditPrize(prize) : notify.warning("Chức năng bị khoá trong chế độ Demo.")}
+                                        >
                                             <PencilIcon className="w-4 h-4" />
                                         </button>
-                                        <button className="action-btn delete" onClick={() => handleDeletePrize(prize.id)}>
+                                        <button 
+                                            className={`action-btn delete ${!canEdit ? 'disabled' : ''}`} 
+                                            onClick={() => canEdit ? handleDeletePrize(prize.id) : notify.warning("Chức năng bị khoá trong chế độ Demo.")}
+                                        >
                                             <TrashIcon className="w-4 h-4" />
                                         </button>
                                     </div>
@@ -453,8 +431,12 @@ const Games: React.FC = () => {
                                             <td>
                                                 <div className="action-buttons">
                                                     <button 
-                                                        className="action-btn add-points"
+                                                        className={`action-btn add-points ${!canEdit ? 'disabled' : ''}`}
                                                         onClick={() => {
+                                                            if (!canEdit) {
+                                                                notify.warning("Chức năng bị khoá trong chế độ Demo.");
+                                                                return;
+                                                            }
                                                             setSelectedUser(profile);
                                                             setShowPointsModal(true);
                                                         }}
@@ -464,8 +446,8 @@ const Games: React.FC = () => {
                                                         Cộng điểm
                                                     </button>
                                                     <button 
-                                                        className="action-btn reset"
-                                                        onClick={() => handleResetSpinLimit(profile.userId, profile.user?.fullName || profile.user?.email || '')}
+                                                        className={`action-btn reset ${!canEdit ? 'disabled' : ''}`}
+                                                        onClick={() => canEdit ? handleResetSpinLimit(profile.userId, profile.user?.fullName || profile.user?.email || '') : notify.warning("Chức năng bị khoá trong chế độ Demo.")}
                                                         title="Reset giới hạn quay"
                                                     >
                                                         <ArrowPathIcon className="w-4 h-4" />

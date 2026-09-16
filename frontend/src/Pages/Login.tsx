@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { User } from '../types/model';
-import { useLogin } from '../hooks/useLogin'; // Import hook vừa tạo
+import { useLogin } from '../hooks/useLogin'; 
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import '../Styles/auth.css';
 
 interface LoginProps {
@@ -16,20 +17,21 @@ const Login: React.FC<LoginProps> = ({
     onSwitchToForgot, 
     onClose 
 }) => {
-    // Sử dụng logic từ Hook
     const {
         email,
         setEmail,
         password,
         setPassword,
         error,
+        isLoading,
         handleSubmit,
         handleDemoLogin
     } = useLogin(onLoginSuccess);
 
+    const [showPassword, setShowPassword] = useState(false);
+
     return (
         <div className="auth-container">
-            {/* Nút đóng giữ nguyên */}
             <button className="auth-close-button" onClick={onClose}>
                 &times; 
             </button>
@@ -48,18 +50,37 @@ const Login: React.FC<LoginProps> = ({
                     className="auth-input"
                 />
 
-                <input
-                    type="password"
-                    placeholder="Mật khẩu"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="auth-input"
-                />
+                <div className="password-input-wrapper" style={{ position: 'relative' }}>
+                    <input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Mật khẩu"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        className="auth-input"
+                        style={{ width: '100%' }}
+                    />
+                    <button 
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="password-toggle-btn"
+                        style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280' }}
+                    >
+                        {showPassword ? <EyeSlashIcon className="w-5 h-5" style={{ width: '20px', height: '20px' }} /> : <EyeIcon className="w-5 h-5" style={{ width: '20px', height: '20px' }} />}
+                    </button>
+                </div>
 
-                <button type="submit" className="auth-button">Đăng Nhập</button>
-                <button type="button" className="auth-button demo-button" onClick={handleDemoLogin} style={{ backgroundColor: '#10b981', marginTop: '10px' }}>
-                    Đăng Nhập Nhanh (Demo)
+                <button type="submit" className={`auth-button ${isLoading ? 'disabled' : ''}`} disabled={isLoading}>
+                    {isLoading ? 'Đang xử lý...' : 'Đăng Nhập'}
+                </button>
+                <button 
+                    type="button" 
+                    className={`auth-button demo-button ${isLoading ? 'disabled' : ''}`} 
+                    onClick={handleDemoLogin} 
+                    disabled={isLoading}
+                    style={{ backgroundColor: '#10b981', marginTop: '10px', opacity: isLoading ? 0.7 : 1 }}
+                >
+                    {isLoading ? 'Đang xử lý...' : 'Đăng Nhập Nhanh (Demo)'}
                 </button>
             </form>
 

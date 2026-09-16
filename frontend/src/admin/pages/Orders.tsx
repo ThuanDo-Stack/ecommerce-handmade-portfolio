@@ -10,6 +10,7 @@ import {
   ChevronRightIcon
 } from '@heroicons/react/24/outline';
 import { useNotify } from '../../components/NotificationContext';
+import { useAdminPermissions } from '../../hooks/useAdminPermissions';
 
 // ==================== TYPES ====================
 interface OrderItemResponse {
@@ -382,6 +383,7 @@ const OrderDetailModal: React.FC<{
 // ==================== MAIN COMPONENT ====================
 const Orders: React.FC = () => {
   const notify = useNotify();
+  const { canEdit } = useAdminPermissions();
 
   // State
   const [orders, setOrders] = useState<OrderResponse[]>([]);
@@ -570,8 +572,20 @@ const Orders: React.FC = () => {
                     <button className="action-btn view" onClick={() => { setSelectedOrder(order); setShowDetailModal(true); }} title="Xem chi tiết"><EyeIcon className="w-4 h-4" /></button>
                     {!['Hoàn thành', 'Đã hủy'].includes(order.status) && (
                       <>
-                        <button className="action-btn edit" onClick={() => { setSelectedOrder(order); setShowUpdateModal(true); }} title="Cập nhật"><PencilIcon className="w-4 h-4" /></button>
-                        <button className="action-btn delete" onClick={() => { setSelectedOrder(order); setShowCancelModal(true); }} title="Hủy đơn"><XCircleIcon className="w-4 h-4" /></button>
+                        <button 
+                          className={`action-btn edit ${!canEdit ? 'disabled' : ''}`} 
+                          onClick={() => canEdit ? (() => { setSelectedOrder(order); setShowUpdateModal(true); })() : notify.warning("Chức năng bị khoá trong chế độ Demo.")} 
+                          title="Cập nhật"
+                        >
+                          <PencilIcon className="w-4 h-4" />
+                        </button>
+                        <button 
+                          className={`action-btn delete ${!canEdit ? 'disabled' : ''}`} 
+                          onClick={() => canEdit ? (() => { setSelectedOrder(order); setShowCancelModal(true); })() : notify.warning("Chức năng bị khoá trong chế độ Demo.")} 
+                          title="Hủy đơn"
+                        >
+                          <XCircleIcon className="w-4 h-4" />
+                        </button>
                       </>
                     )}
                   </div>

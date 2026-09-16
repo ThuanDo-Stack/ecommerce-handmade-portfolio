@@ -43,7 +43,7 @@ public class DataSeeder implements CommandLineRunner {
         }
 
         // 2. Tạo tài khoản Admin mặc định nếu chưa có
-        if (userRepository.findByEmail("admin@handmade.com").isEmpty()) {
+        if (!userRepository.existsByUsername("admin") && !userRepository.existsByEmail("admin@handmade.com")) {
             User admin = new User();
             admin.setUsername("admin");
             admin.setEmail("admin@handmade.com");
@@ -66,7 +66,7 @@ public class DataSeeder implements CommandLineRunner {
             roleRepository.save(demoAdminRole);
         }
 
-        if (userRepository.findByEmail("demo@admin.com").isEmpty()) {
+        if (!userRepository.existsByUsername("demoadmin") && !userRepository.existsByEmail("demo@admin.com")) {
             User demoAdmin = new User();
             demoAdmin.setUsername("demoadmin");
             demoAdmin.setEmail("demo@admin.com");
